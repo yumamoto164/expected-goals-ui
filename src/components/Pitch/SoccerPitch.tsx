@@ -30,7 +30,7 @@ const SoccerPitch = memo(function SoccerPitch({ shots, onShotRecorded }: SoccerP
   const getCoords = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
     const rect = svgRef.current!.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * PITCH_WIDTH;
-    const y = ((e.clientY - rect.top) / rect.height) * PITCH_HEIGHT;
+    const y = PITCH_HEIGHT - ((e.clientY - rect.top) / rect.height) * PITCH_HEIGHT;
     return { x, y };
   }, []);
 
