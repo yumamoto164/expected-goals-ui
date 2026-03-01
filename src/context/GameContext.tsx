@@ -6,9 +6,9 @@ import {
   useRef,
   useEffect,
   type ReactNode,
-} from 'react';
-import type { Player, Shot, TeamStats, GamePhase } from '../types';
-import { fetchXG } from '../hooks/useXG';
+} from "react";
+import type { Player, Shot, TeamStats, GamePhase } from "../types";
+import { fetchXG } from "../hooks/useXG";
 
 // ---------------------------------------------------------------------------
 // State
@@ -22,7 +22,7 @@ interface GameState {
   shots: Shot[];
   homeStats: TeamStats;
   awayStats: TeamStats;
-  selectedTeam: 'home' | 'away';
+  selectedTeam: "home" | "away";
   selectedPlayer: Player | null;
   bodyPart: 0 | 1;
   assistType: 0 | 1 | 2 | 3 | 4;
@@ -33,15 +33,15 @@ interface GameState {
 const emptyStats = (): TeamStats => ({ goals: 0, shots: 0, sot: 0, xG: 0 });
 
 const initialState: GameState = {
-  phase: 'entry',
-  homeTeamName: '',
-  awayTeamName: '',
+  phase: "entry",
+  homeTeamName: "",
+  awayTeamName: "",
   homePlayers: [],
   awayPlayers: [],
   shots: [],
   homeStats: emptyStats(),
   awayStats: emptyStats(),
-  selectedTeam: 'home',
+  selectedTeam: "home",
   selectedPlayer: null,
   bodyPart: 0,
   assistType: 4,
@@ -54,21 +54,21 @@ const initialState: GameState = {
 // ---------------------------------------------------------------------------
 type Action =
   | {
-      type: 'SET_ROSTER';
+      type: "SET_ROSTER";
       homeTeamName: string;
       awayTeamName: string;
       homePlayers: Player[];
       awayPlayers: Player[];
     }
-  | { type: 'SET_PHASE'; phase: GamePhase }
-  | { type: 'SET_SELECTED_TEAM'; team: 'home' | 'away' }
-  | { type: 'SET_SELECTED_PLAYER'; player: Player | null }
-  | { type: 'SET_BODY_PART'; value: 0 | 1 }
-  | { type: 'SET_ASSIST_TYPE'; value: 0 | 1 | 2 | 3 | 4 }
-  | { type: 'SET_SHOT_TYPE'; value: 0 | 1 | 2 | 3 | 4 }
-  | { type: 'ADD_SHOT'; shot: Shot }
-  | { type: 'REMOVE_LAST_SHOT' }
-  | { type: 'RESET_GAME' };
+  | { type: "SET_PHASE"; phase: GamePhase }
+  | { type: "SET_SELECTED_TEAM"; team: "home" | "away" }
+  | { type: "SET_SELECTED_PLAYER"; player: Player | null }
+  | { type: "SET_BODY_PART"; value: 0 | 1 }
+  | { type: "SET_ASSIST_TYPE"; value: 0 | 1 | 2 | 3 | 4 }
+  | { type: "SET_SHOT_TYPE"; value: 0 | 1 | 2 | 3 | 4 }
+  | { type: "ADD_SHOT"; shot: Shot }
+  | { type: "REMOVE_LAST_SHOT" }
+  | { type: "RESET_GAME" };
 
 // ---------------------------------------------------------------------------
 // Stats helpers
@@ -82,11 +82,14 @@ function addShotToStats(stats: TeamStats, shot: Shot): TeamStats {
   };
 }
 
-function rebuildStats(shots: Shot[]): { homeStats: TeamStats; awayStats: TeamStats } {
+function rebuildStats(shots: Shot[]): {
+  homeStats: TeamStats;
+  awayStats: TeamStats;
+} {
   const home = emptyStats();
   const away = emptyStats();
   for (const s of shots) {
-    const target = s.team === 'home' ? home : away;
+    const target = s.team === "home" ? home : away;
     target.goals += s.isGoal ? 1 : 0;
     target.shots += 1;
     target.sot += s.onTarget || s.isGoal ? 1 : 0;
@@ -100,7 +103,7 @@ function rebuildStats(shots: Shot[]): { homeStats: TeamStats; awayStats: TeamSta
 // ---------------------------------------------------------------------------
 function gameReducer(state: GameState, action: Action): GameState {
   switch (action.type) {
-    case 'SET_ROSTER':
+    case "SET_ROSTER":
       return {
         ...state,
         homeTeamName: action.homeTeamName,
@@ -110,11 +113,12 @@ function gameReducer(state: GameState, action: Action): GameState {
         selectedPlayer: action.homePlayers[0] ?? null,
       };
 
-    case 'SET_PHASE':
+    case "SET_PHASE":
       return { ...state, phase: action.phase };
 
-    case 'SET_SELECTED_TEAM': {
-      const players = action.team === 'home' ? state.homePlayers : state.awayPlayers;
+    case "SET_SELECTED_TEAM": {
+      const players =
+        action.team === "home" ? state.homePlayers : state.awayPlayers;
       return {
         ...state,
         selectedTeam: action.team,
@@ -122,38 +126,38 @@ function gameReducer(state: GameState, action: Action): GameState {
       };
     }
 
-    case 'SET_SELECTED_PLAYER':
+    case "SET_SELECTED_PLAYER":
       return { ...state, selectedPlayer: action.player };
 
-    case 'SET_BODY_PART':
+    case "SET_BODY_PART":
       return { ...state, bodyPart: action.value };
 
-    case 'SET_ASSIST_TYPE':
+    case "SET_ASSIST_TYPE":
       return { ...state, assistType: action.value };
 
-    case 'SET_SHOT_TYPE':
+    case "SET_SHOT_TYPE":
       return { ...state, shotType: action.value };
 
-    case 'ADD_SHOT': {
+    case "ADD_SHOT": {
       const shots = [...state.shots, action.shot];
       const homeStats =
-        action.shot.team === 'home'
+        action.shot.team === "home"
           ? addShotToStats(state.homeStats, action.shot)
           : state.homeStats;
       const awayStats =
-        action.shot.team === 'away'
+        action.shot.team === "away"
           ? addShotToStats(state.awayStats, action.shot)
           : state.awayStats;
       return { ...state, shots, homeStats, awayStats, lastXG: action.shot.xG };
     }
 
-    case 'REMOVE_LAST_SHOT': {
+    case "REMOVE_LAST_SHOT": {
       if (state.shots.length === 0) return state;
       const shots = state.shots.slice(0, -1);
       return { ...state, shots, ...rebuildStats(shots), lastXG: null };
     }
 
-    case 'RESET_GAME':
+    case "RESET_GAME":
       return { ...initialState };
 
     default:
@@ -170,10 +174,10 @@ interface GameContextValue {
     homeTeamName: string,
     awayTeamName: string,
     homePlayers: Player[],
-    awayPlayers: Player[]
+    awayPlayers: Player[],
   ) => void;
   startGame: () => void;
-  setSelectedTeam: (team: 'home' | 'away') => void;
+  setSelectedTeam: (team: "home" | "away") => void;
   setSelectedPlayer: (player: Player | null) => void;
   setBodyPart: (value: 0 | 1) => void;
   setAssistType: (value: 0 | 1 | 2 | 3 | 4) => void;
@@ -209,39 +213,50 @@ export function GameProvider({ children }: { children: ReactNode }) {
       homeTeamName: string,
       awayTeamName: string,
       homePlayers: Player[],
-      awayPlayers: Player[]
+      awayPlayers: Player[],
     ) => {
-      dispatch({ type: 'SET_ROSTER', homeTeamName, awayTeamName, homePlayers, awayPlayers });
+      dispatch({
+        type: "SET_ROSTER",
+        homeTeamName,
+        awayTeamName,
+        homePlayers,
+        awayPlayers,
+      });
     },
-    []
+    [],
   );
 
   const startGame = useCallback(() => {
-    dispatch({ type: 'SET_PHASE', phase: 'game' });
+    dispatch({ type: "SET_PHASE", phase: "game" });
   }, []);
 
-  const setSelectedTeam = useCallback((team: 'home' | 'away') => {
-    dispatch({ type: 'SET_SELECTED_TEAM', team });
+  const setSelectedTeam = useCallback((team: "home" | "away") => {
+    dispatch({ type: "SET_SELECTED_TEAM", team });
   }, []);
 
   const setSelectedPlayer = useCallback((player: Player | null) => {
-    dispatch({ type: 'SET_SELECTED_PLAYER', player });
+    dispatch({ type: "SET_SELECTED_PLAYER", player });
   }, []);
 
   const setBodyPart = useCallback((value: 0 | 1) => {
-    dispatch({ type: 'SET_BODY_PART', value });
+    dispatch({ type: "SET_BODY_PART", value });
   }, []);
 
   const setAssistType = useCallback((value: 0 | 1 | 2 | 3 | 4) => {
-    dispatch({ type: 'SET_ASSIST_TYPE', value });
+    dispatch({ type: "SET_ASSIST_TYPE", value });
   }, []);
 
   const setShotType = useCallback((value: 0 | 1 | 2 | 3 | 4) => {
-    dispatch({ type: 'SET_SHOT_TYPE', value });
+    dispatch({ type: "SET_SHOT_TYPE", value });
   }, []);
 
   const recordShot = useCallback(
-    async (params: { x: number; y: number; onTarget: boolean; isGoal: boolean }) => {
+    async (params: {
+      x: number;
+      y: number;
+      onTarget: boolean;
+      isGoal: boolean;
+    }) => {
       const { selectedPlayer, selectedTeam, bodyPart, assistType, shotType } =
         stateRef.current;
 
@@ -250,7 +265,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
         xG = await fetchXG({
           x: params.x,
           y: params.y,
-          on_target: params.onTarget || params.isGoal,
           body_part: bodyPart,
           assist_type: assistType,
           shot_type: shotType,
@@ -273,18 +287,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
         xG,
       };
 
-      dispatch({ type: 'ADD_SHOT', shot });
+      dispatch({ type: "ADD_SHOT", shot });
     },
-    []
+    [],
   );
 
   const removeLastShot = useCallback(() => {
-    dispatch({ type: 'REMOVE_LAST_SHOT' });
+    dispatch({ type: "REMOVE_LAST_SHOT" });
   }, []);
 
   const resetGame = useCallback(() => {
     nextId = 1;
-    dispatch({ type: 'RESET_GAME' });
+    dispatch({ type: "RESET_GAME" });
   }, []);
 
   return (
@@ -313,6 +327,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
 // ---------------------------------------------------------------------------
 export function useGame() {
   const ctx = useContext(GameContext);
-  if (!ctx) throw new Error('useGame must be used inside GameProvider');
+  if (!ctx) throw new Error("useGame must be used inside GameProvider");
   return ctx;
 }

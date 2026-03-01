@@ -4,10 +4,17 @@ const XG_MODEL_API_URL =
   import.meta.env.VITE_XG_MODEL_API_URL || "http://localhost:5000";
 
 export async function fetchXG(payload: ShotPayload): Promise<number> {
+  const adjustedPayload = {
+    x: payload.x,
+    y: payload.y,
+    body_part_name: payload.body_part,
+    shot_type_name: payload.shot_type,
+    assist_type: payload.assist_type,
+  };
   const res = await fetch(`${XG_MODEL_API_URL}/expected-goals`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(adjustedPayload),
   });
   if (!res.ok) {
     throw new Error(`xG API error: ${res.status}`);
