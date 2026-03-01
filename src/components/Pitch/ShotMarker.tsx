@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { SHOT_COLORS } from '../../constants';
+import { SHOT_COLORS, PITCH_HEIGHT } from '../../constants';
 import type { Shot } from '../../types';
 
 interface ShotMarkerProps {
@@ -16,7 +16,7 @@ const ShotMarker = memo(function ShotMarker({ shot }: ShotMarkerProps) {
   return (
     <circle
       cx={shot.x}
-      cy={shot.y}
+      cy={PITCH_HEIGHT - shot.y}
       r={0.8}
       fill={color}
       opacity={0.85}
