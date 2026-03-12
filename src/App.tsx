@@ -1,10 +1,10 @@
-import { useCallback } from 'react';
-import { useGame } from './context/GameContext';
-import TeamEntry from './components/TeamEntry/TeamEntry';
-import SoccerPitch from './components/Pitch/SoccerPitch';
-import ShotControls from './components/Controls/ShotControls';
-import Scoreboard from './components/Scoreboard';
-import ExportButton from './components/ExportButton';
+import { useCallback } from "react";
+import { useGame } from "./context/GameContext";
+import TeamEntry from "./components/TeamEntry/TeamEntry";
+import SoccerPitch from "./components/Pitch/SoccerPitch";
+import ShotControls from "./components/Controls/ShotControls";
+import Scoreboard from "./components/Scoreboard";
+import ExportButton from "./components/ExportButton";
 
 function GameView() {
   const { state, recordShot, resetGame } = useGame();
@@ -13,14 +13,14 @@ function GameView() {
     (params: { x: number; y: number; onTarget: boolean; isGoal: boolean }) => {
       void recordShot(params);
     },
-    [recordShot]
+    [recordShot],
   );
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-3 bg-gray-800 border-b border-gray-700">
-        <h1 className="text-xl font-bold text-emerald-400">Expected Goals</h1>
+        <h1 className="text-xl font-bold text-white-400">Expected Goals</h1>
         <div className="text-center">
           <span className="text-2xl font-bold">
             {state.homeStats.goals} – {state.awayStats.goals}
@@ -47,7 +47,10 @@ function GameView() {
         {/* Center: Pitch */}
         <div className="flex-1 flex items-start justify-center">
           <div className="w-full max-w-3xl">
-            <SoccerPitch shots={state.shots} onShotRecorded={handleShotRecorded} />
+            <SoccerPitch
+              shots={state.shots}
+              onShotRecorded={handleShotRecorded}
+            />
           </div>
         </div>
 
@@ -69,5 +72,5 @@ function GameView() {
 export default function App() {
   const { state } = useGame();
 
-  return state.phase === 'entry' ? <TeamEntry /> : <GameView />;
+  return state.phase === "entry" ? <TeamEntry /> : <GameView />;
 }
