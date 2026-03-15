@@ -4,7 +4,8 @@ import TeamEntry from "./components/TeamEntry/TeamEntry";
 import SoccerPitch from "./components/Pitch/SoccerPitch";
 import ShotControls from "./components/Controls/ShotControls";
 import Scoreboard from "./components/Scoreboard";
-import ExportButton from "./components/ExportButton";
+import { downloadCsv } from "./utils/exportCsv";
+import { isEmpty } from "lodash";
 
 function GameView() {
   const { state, recordShot, resetGame } = useGame();
@@ -19,52 +20,67 @@ function GameView() {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 bg-gray-800 border-b border-gray-700">
+      <header className="grid grid-cols-3 items-center px-6 py-3 bg-gray-800 border-b border-gray-700">
         <h1 className="text-xl font-bold text-white-400">Expected Goals</h1>
-        <div className="text-center">
+        <div className="flex items-center justify-center gap-4">
+          <span className="text-sm text-gray-400 text-right">
+            {isEmpty(state.homeTeamName) ? "Home Team" : state.homeTeamName}
+          </span>
           <span className="text-2xl font-bold">
             {state.homeStats.goals} – {state.awayStats.goals}
           </span>
-          <p className="text-xs text-gray-400">
-            {state.homeTeamName} vs {state.awayTeamName}
-          </p>
+          <span className="text-sm text-gray-400 text-left">
+            {isEmpty(state.awayTeamName) ? "Away Team" : state.awayTeamName}
+          </span>
         </div>
-        <button
-          onClick={resetGame}
-          className="text-sm text-gray-400 hover:text-white transition-colors cursor-pointer"
-        >
-          New Game
-        </button>
+        <div className="flex justify-end">
+          <button
+            onClick={resetGame}
+            className="text-sm text-gray-400 hover:text-white transition-colors cursor-pointer"
+          >
+            New Game
+          </button>
+        </div>
       </header>
 
       {/* Main layout */}
-      <div className="flex flex-col lg:flex-row flex-1 gap-4 p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_3fr_1fr] gap-4 p-4 pb-0">
         {/* Left: Controls */}
-        <div className="lg:w-56 xl:w-64 shrink-0">
+        <div>
           <ShotControls />
         </div>
 
-        {/* Center: Pitch */}
-        <div className="flex-1 flex items-start justify-center">
-          <div className="w-full max-w-3xl">
-            <SoccerPitch
-              shots={state.shots}
-              onShotRecorded={handleShotRecorded}
-            />
-          </div>
+        {/* Center: Pitch + Last xG */}
+        <div>
+          <SoccerPitch
+            shots={state.shots}
+            onShotRecorded={handleShotRecorded}
+          />
+          {state.lastXG !== null && (
+            <div className="flex items-center justify-center gap-2 pt-3">
+              <span className="text-xs text-gray-400 uppercase tracking-wider">
+                Last xG
+              </span>
+              <span className="text-2xl font-bold text-emerald-400">
+                {state.lastXG.toFixed(3)}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Right: Scoreboard + Export */}
-        <div className="lg:w-52 xl:w-60 shrink-0 flex flex-col gap-4">
+        <div className="h-full">
           <Scoreboard
             homeTeamName={state.homeTeamName}
             awayTeamName={state.awayTeamName}
             homeStats={state.homeStats}
             awayStats={state.awayStats}
+            onExport={() => downloadCsv(state.shots, state.homeTeamName, state.awayTeamName)}
+            exportDisabled={state.shots.length === 0}
           />
-          <ExportButton />
         </div>
       </div>
+
     </div>
   );
 }
