@@ -10,11 +10,11 @@ const ASSIST_TYPE_LABELS: Record<number, string> = {
   4: "open play",
 };
 const SHOT_TYPE_LABELS: Record<number, string> = {
-  0: "free_kick",
+  0: "free kick",
   1: "corner",
-  2: "throw_in",
-  3: "dir_set_piece",
-  4: "open_play",
+  2: "throw in",
+  3: "set piece",
+  4: "open play",
 };
 
 export function downloadCsv(shots: Shot[], homeTeam: string, awayTeam: string) {
